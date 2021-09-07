@@ -1,0 +1,26 @@
+{
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hsengu/employee-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hsengu/employee-tracker/issues"
+  },
+  "homepage": "https://github.com/hsengu/employee-tracker#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "jest": "^27.1.0",
+    "mysql2": "^2.3.0"
+  }
+}
