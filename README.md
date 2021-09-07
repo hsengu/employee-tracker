@@ -32,7 +32,7 @@
 
 
 ## Contributing to Employee Tracker
-Please follow contribution guidelines at the [Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) to contribute to Readme Generator.
+Please follow contribution guidelines at the [Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) to contribute to Employee Tracker.
 
 ## Tests
     This application was tested using Jest running under Ubuntu 20.04 LTS on WSL2. YMMV.

@@ -20,6 +20,7 @@
   "homepage": "https://github.com/hsengu/employee-tracker#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "inquirer": "^8.1.2",
     "jest": "^27.1.0",
     "mysql2": "^2.3.0"
   }
