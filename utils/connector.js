@@ -1,5 +1,6 @@
 const mysql = require('mysql2');
 
+// Create a connection to the SQL DB
 const db = mysql.createConnection(
     {
         host: 'localhost',
@@ -10,6 +11,7 @@ const db = mysql.createConnection(
     console.log('Connected to the employee_tracker database.')
 );
 
+// SQL Query function - Get all departments
 const getDepartments = () => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM department
@@ -23,6 +25,7 @@ const getDepartments = () => {
     });
 };
 
+// SQL Query function - Get all Roles
 const getRoles = () => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT r.id, r.title, r.salary, d.name AS department
@@ -38,9 +41,15 @@ const getRoles = () => {
     });
 };
 
+// SQL Query function - Get all Employees
 const getEmployees = () => {
     return new Promise((resolve, reject) => {
-        const sql = `SELECT e.id, CONCAT(e.first_name, ' ', e.last_name) AS name, r.title AS title, d.name AS department, r.salary AS salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
+        const sql = `SELECT e.id,
+            CONCAT(e.first_name, ' ', e.last_name) AS name,
+            r.title AS title,
+            d.name AS department,
+            r.salary AS salary,
+            CONCAT(m.first_name, ' ', m.last_name) AS manager
             FROM employee e
             JOIN role r ON r.id = e.role_id
             JOIN department d ON d.id = r.department_id
@@ -56,9 +65,14 @@ const getEmployees = () => {
     });
 };
 
+// SQL Query Function - Get all Employees by Department
 const getEmployeesByDept = department => {
     return new Promise((resolve, reject) => {
-        const sql = `SELECT e.id, CONCAT(e.first_name, ' ', e.last_name) AS name, r.title AS title, d.name AS department, r.salary AS salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
+        const sql = `SELECT e.id, 
+            CONCAT(e.first_name, ' ', e.last_name) AS name, 
+            r.title AS title, d.name AS department, 
+            r.salary AS salary, 
+            CONCAT(m.first_name, ' ', m.last_name) AS manager
             FROM employee e
             JOIN role r ON r.id = e.role_id
             JOIN department d ON d.id = r.department_id
@@ -74,9 +88,11 @@ const getEmployeesByDept = department => {
     });
 };
 
+// SQL Query Function - Get all Managers
 const getManagers = () => {
     return new Promise((resolve, reject) => {
-        const sql = `SELECT DISTINCT CONCAT(m.first_name, ' ', m.last_name) AS name FROM employee e
+        const sql = `SELECT DISTINCT CONCAT(m.first_name, ' ',
+            m.last_name) AS name FROM employee e
             JOIN employee m ON e.manager_id = m.id;`
         db.query(sql, (err, res, fields) => {
             if(err) {
@@ -88,9 +104,15 @@ const getManagers = () => {
     });
 };
 
+// SQL Query Function - Get all Employees by Manager
 const getEmployeesByManager = manager => {
     return new Promise((resolve, reject) => {
-        const sql = `SELECT e.id, CONCAT(e.first_name, ' ', e.last_name) AS name, r.title AS title, d.name AS department, r.salary AS salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
+        const sql = `SELECT e.id,
+            CONCAT(e.first_name, ' ', e.last_name) AS name,
+            r.title AS title,
+            d.name AS department,
+            r.salary AS salary,
+            CONCAT(m.first_name, ' ', m.last_name) AS manager
             FROM employee e
             JOIN role r ON r.id = e.role_id
             JOIN department d ON d.id = r.department_id
@@ -106,6 +128,7 @@ const getEmployeesByManager = manager => {
     });
 };
 
+// SQL Query Function - Add a new Department
 const addDepartment = deptName => {
     return new Promise((resolve, reject) => {
         const sql = `INSERT INTO department (name)
@@ -120,6 +143,7 @@ const addDepartment = deptName => {
     });
 };
 
+// SQL Query Function - Add a new Role
 const addRole = (roleName, roleSalary, roleDepartment) => {
     return new Promise((resolve, reject) => {
         const sql = `INSERT INTO role (title, salary, department_id)
@@ -134,6 +158,7 @@ const addRole = (roleName, roleSalary, roleDepartment) => {
     })
 };
 
+// SQL Query Function - Add a new Employee
 const addEmployee = (employeeFirstName, employeeLastName, employeeRole, employeeManager) => {
     return new Promise((resolve, reject) => {
         const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
@@ -148,6 +173,7 @@ const addEmployee = (employeeFirstName, employeeLastName, employeeRole, employee
     })
 };
 
+// SQL Query Function - Uodate an Employee's Role
 const updateEmployeeRole = (employeeName, employeeRole) => {
     return new Promise((resolve, reject) => {
         const sql = `UPDATE employee
@@ -163,6 +189,7 @@ const updateEmployeeRole = (employeeName, employeeRole) => {
     });
 };
 
+// SQL Query Function - Update and Employee's Manager
 const updateEmployeeManager = (employeeName, employeeManager) => {
     return new Promise((resolve, reject) => {
         const sql = `UPDATE employee AS e,
@@ -179,6 +206,7 @@ const updateEmployeeManager = (employeeName, employeeManager) => {
     });
 };
 
+// SQL Query Function - Remove an Employee
 const removeEmployee = (employeeName) => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM employee WHERE CONCAT(first_name, ' ', last_name) = ?`;
@@ -192,6 +220,7 @@ const removeEmployee = (employeeName) => {
     });
 };
 
+// SQL Query Function - Remove a Role
 const removeRole = (roleName) => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM role WHERE title = ?`;
@@ -205,6 +234,7 @@ const removeRole = (roleName) => {
     });
 };
 
+// SQL Query Function - Remove a Department
 const removeDepartment = (departmentName) => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM department WHERE name = ?`;
@@ -218,9 +248,10 @@ const removeDepartment = (departmentName) => {
     });
 };
 
+// SQL Query Function - Get Budget by Department
 const getBudget = (departmentName) => {
     return new Promise((resolve, reject) => {
-        const sql = `SELECT d.id AS id, d.name AS name, (SELECT SUM(salary)) as budget
+        const sql = `SELECT d.id AS id, d.name AS department, (SELECT SUM(salary)) as budget
             FROM department d
             JOIN role r ON d.id = r.department_id
             JOIN employee e ON e.role_id = r.id
@@ -234,6 +265,7 @@ const getBudget = (departmentName) => {
     });
 };
 
+// Export all the above functions
 module.exports = {
     getDepartments: getDepartments,
     getRoles: getRoles,

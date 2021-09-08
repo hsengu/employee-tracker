@@ -1,9 +1,11 @@
 const inquirer = require('inquirer');
+const cTable = require('console.table');
 const db = require('./utils/connector.js');
 const val = require('./utils/inputValidator.js');
 
 const PORT = 3001 || process.env.PORT;
 
+// Main menu prompt function
 const prompt = () => {
     return inquirer.prompt([
         {
@@ -25,7 +27,8 @@ const prompt = () => {
                 'Remove Role',
                 'Remove Employee',
                 'View Budget by Department',
-                'Exit application'
+                'Exit application',
+                new inquirer.Separator
             ]
         }
     ]).then(({ userChoice }) => {
@@ -33,22 +36,31 @@ const prompt = () => {
     });
 };
 
+// Handler function to handle main menu selection from user
+// 1. SELECT cases perform: DB Query -> Build Table -> Display Table -> Callback to main menu prompt
+// 2. INSERT cases perform: Prompt User for Input -> Perform DB insert query -> Callback to main menu prompt
+// 3. UPDATE cases perform: Prompt User for Input -> Perform DB update query -> Callback to main menu prompt
+// 4. DELETE cases perform: Prompt User for Input -> Perform DB delete query -> Callback to main menu prompt
+// 5. Quit Application case will exit the application
 const choiceHandler = userChoice => {
     let message = '';
 
     switch(userChoice) {
         case 'View all departments': db.getDepartments().then(table => {
-                console.table(table);
+                table = cTable.getTable(table);
+                console.table('\nAll Departments\n===============', table);
                 prompt();
             })
             break;
         case 'View all roles': db.getRoles().then(table => {
-                console.table(table);
+                table = cTable.getTable(table);
+                console.table('\nAll Roles\n=========', table);
                 prompt();
             })
             break;
         case 'View all employees': db.getEmployees().then(table => {
-                console.table(table);
+                table = cTable.getTable(table);
+                console.table('\nAll Employees\n=============', table);
                 prompt();
             });
             break;
@@ -58,7 +70,8 @@ const choiceHandler = userChoice => {
                 inquirer.prompt(promptChoices(message, 'dept', table)).then(department => {
                     return db.getEmployeesByDept(department.deptChoice);
                 }).then(deptEmployeeTable => {
-                    console.table(deptEmployeeTable);
+                    table = cTable.getTable(table);
+                    console.table('\nEmployees by Department\n=======================', deptEmployeeTable);
                     prompt();
                 })
             });
@@ -69,7 +82,8 @@ const choiceHandler = userChoice => {
                 inquirer.prompt(promptChoices(message, 'mgr', table)).then(manager => {
                     return db.getEmployeesByManager(manager.mgrChoice);
                 }).then(mgrEmployeeTable => {
-                    console.table(mgrEmployeeTable);
+                    table = cTable.getTable(table);
+                    console.table('\nEmployees by Manager\n====================', mgrEmployeeTable);
                     prompt();
                 })
             });
@@ -107,7 +121,8 @@ const choiceHandler = userChoice => {
             });
             break;
         case 'View Budget by Department': promptDepartmentBudget().then((table) => {
-                console.table(table);
+                table = cTable.getTable(table);
+                console.table('\nBudgets by Department\n=====================', table);
                 prompt();
             });
             break;
@@ -116,6 +131,7 @@ const choiceHandler = userChoice => {
     }
 };
 
+// Helper function to prompt choices for selecting Managers or Department
 const promptChoices = (msg, type, choices) => {    
     return {
         type: 'list',
@@ -125,6 +141,7 @@ const promptChoices = (msg, type, choices) => {
     }
 };
 
+// Prompt function for prompting add a department
 promptAddDepartment = () => {
     return inquirer.prompt([
         {
@@ -142,7 +159,9 @@ promptAddDepartment = () => {
     })
 };
 
+// Prompt function for prompting add a role
 promptAddRole = async () => {
+    // Create a department prompt
     const deptPrompt = await db.getDepartments().then(table => {
             return promptChoices('What department does this role belong to?', 'role', table);
     });
@@ -177,11 +196,14 @@ promptAddRole = async () => {
     return prompt;
 };
 
+// Prompt function for prompting add an employee
 promptAddEmployee = async () => {
+    // Create a role prompt
     const rolePrompt = await db.getRoles().then(table => {
         return promptChoices('What role does this employee have?', 'role', table);
     });
 
+    // Create a manager prompt
     const managerPrompt = await db.getEmployees().then(table => {
         return promptChoices('Which manager does this employee report to?', 'mgr', table);
     });
@@ -216,11 +238,14 @@ promptAddEmployee = async () => {
     return prompt;
 };
 
+// Prompt function for prompting to update an employee's role
 promptUpdateEmployeeRole = async () => {
+    // Create an employee prompt
     const employeePrompt = await db.getEmployees().then(table => {
         return promptChoices('Which employee would you like to update?', 'emp', table)
     });
 
+    // Create a role prompt
     const rolePrompt = await db.getRoles().then(table => {
         return promptChoices("What is this employee's new role?", 'role', table);
     });
@@ -235,11 +260,14 @@ promptUpdateEmployeeRole = async () => {
     return prompt;
 };
 
+// Prompt function for prompting to update an employee's manager
 promptUpdateEmployeeManager = async () => {
+    // Create an employee prompt
     const employeePrompt = await db.getEmployees().then(table => {
         return promptChoices('Which employee would you like to update?', 'emp', table)
     });
 
+    // Create a manager prompt
     const managerPrompt = await db.getEmployees().then(table => {
         return promptChoices("Who is this employee's new manager?", 'mgr', table);
     });
@@ -254,7 +282,9 @@ promptUpdateEmployeeManager = async () => {
     return prompt;
 };
 
+// Prompt function for prompting to removing an employee
 promptRemoveEmployee = async () => {
+    // Create an employee prompt
     const employeePrompt = await db.getEmployees().then(table => {
         return promptChoices('Which employee would you like to remove?', 'emp', table)
     });
@@ -268,7 +298,9 @@ promptRemoveEmployee = async () => {
     return prompt;
 };
 
+// Prompt function for prompting to removing a department
 promptRemoveDepartment = async () => {
+    // Create a department prompt
     const departmentPrompt = await db.getDepartments().then(table => {
         return promptChoices('Which department would you like to remove?', 'dept', table)
     });
@@ -282,7 +314,9 @@ promptRemoveDepartment = async () => {
     return prompt;
 };
 
+// Prompt function for prompting to removing a role
 promptRemoveRole = async () => {
+    // Create a role prompt
     const rolePrompt = await db.getRoles().then(table => {
         return promptChoices('Which role would you like to remove?', 'role', table)
     });
@@ -296,7 +330,9 @@ promptRemoveRole = async () => {
     return prompt;
 };
 
+// Prompt function for getting budget by department
 promptDepartmentBudget = async () => {
+    // Create a department prompt
     const departmentPrompt = await db.getDepartments().then(table => {
         return promptChoices('Which department would you like to remove?', 'dept', table)
     });
@@ -310,6 +346,7 @@ promptDepartmentBudget = async () => {
     return prompt;
 };
 
+// Init function to kick off the application
 const init = () => {
     console.log(`
 ================
@@ -320,4 +357,5 @@ Employee Tracker
     prompt();
 }
 
+// Call init function
 init();

@@ -1,17 +1,11 @@
 const db = require('./connector.js');
 
-const validateDept = deptName => {
-    return db.getDepartments().then(table => {
-        let found = table.findIndex(element => element.name === deptName);
-        return found !== -1 ? table[found] : found;
-    });
-}
-
+// Helper function to validate salary input
 const validateSalary = salary => {
     return !isNaN(salary);
 }
 
+// Export functions
 module.exports = {
-    validateDept: validateDept,
     validateSalary: validateSalary
 }
