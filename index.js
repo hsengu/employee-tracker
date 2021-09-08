@@ -19,9 +19,12 @@ const prompt = () => {
                 'Add Department',
                 'Add Role',
                 'Add Employee',
-                'Remove Employee',
                 'Update Employee Role',
                 'Update Employee Manager',
+                'Remove Department',
+                'Remove Role',
+                'Remove Employee',
+                'View Budget by Department',
                 'Exit application'
             ]
         }
@@ -83,11 +86,30 @@ const choiceHandler = userChoice => {
                 prompt();
             });
             break;
-        case 'Remove Employee': 
+        case 'Update Employee Role': promptUpdateEmployeeRole().then(() => {
+                prompt();
+            });
             break;
-        case 'Update Employee Role': 
+        case 'Update Employee Manager': promptUpdateEmployeeManager().then(() => {
+                prompt();
+            });
             break;
-        case 'Update Employee Manager': 
+        case 'Remove Department': promptRemoveDepartment().then(() => {
+                prompt();
+            });
+            break;
+        case 'Remove Role': promptRemoveRole().then(() => {
+                prompt();
+            });
+            break;
+        case 'Remove Employee': promptRemoveEmployee().then(() => {
+                prompt();
+            });
+            break;
+        case 'View Budget by Department': promptDepartmentBudget().then((table) => {
+                console.table(table);
+                prompt();
+            });
             break;
         case 'Exit application':
             process.exit(1);
@@ -187,13 +209,106 @@ promptAddEmployee = async () => {
         },
         rolePrompt,
         managerPrompt
-    ]).then(answers => {
-        console.log(answers);
-    })
+    ]).then(({ employeeFirstName, employeeLastName, roleChoice, mgrChoice }) => {
+        db.addEmployee(employeeFirstName, employeeLastName, roleChoice, mgrChoice);
+    });
 
     return prompt;
 };
 
+promptUpdateEmployeeRole = async () => {
+    const employeePrompt = await db.getEmployees().then(table => {
+        return promptChoices('Which employee would you like to update?', 'emp', table)
+    });
+
+    const rolePrompt = await db.getRoles().then(table => {
+        return promptChoices("What is this employee's new role?", 'role', table);
+    });
+
+    const prompt = await inquirer.prompt([
+        employeePrompt,
+        rolePrompt
+    ]).then(({ empChoice, roleChoice }) => {
+        db.updateEmployeeRole(empChoice, roleChoice);
+    });
+
+    return prompt;
+};
+
+promptUpdateEmployeeManager = async () => {
+    const employeePrompt = await db.getEmployees().then(table => {
+        return promptChoices('Which employee would you like to update?', 'emp', table)
+    });
+
+    const managerPrompt = await db.getEmployees().then(table => {
+        return promptChoices("Who is this employee's new manager?", 'mgr', table);
+    });
+
+    const prompt = await inquirer.prompt([
+        employeePrompt,
+        managerPrompt
+    ]).then(({ empChoice, mgrChoice }) => {
+        db.updateEmployeeManager(empChoice, mgrChoice);
+    });
+
+    return prompt;
+};
+
+promptRemoveEmployee = async () => {
+    const employeePrompt = await db.getEmployees().then(table => {
+        return promptChoices('Which employee would you like to remove?', 'emp', table)
+    });
+
+    const prompt = await inquirer.prompt([
+        employeePrompt
+    ]).then(({ empChoice }) => {
+        db.removeEmployee(empChoice);
+    });
+
+    return prompt;
+};
+
+promptRemoveDepartment = async () => {
+    const departmentPrompt = await db.getDepartments().then(table => {
+        return promptChoices('Which department would you like to remove?', 'dept', table)
+    });
+
+    const prompt = await inquirer.prompt([
+        departmentPrompt
+    ]).then(({ deptChoice }) => {
+        db.removeDepartment(deptChoice);
+    });
+
+    return prompt;
+};
+
+promptRemoveRole = async () => {
+    const rolePrompt = await db.getRoles().then(table => {
+        return promptChoices('Which role would you like to remove?', 'role', table)
+    });
+
+    const prompt = await inquirer.prompt([
+        rolePrompt
+    ]).then(({ roleChoice }) => {
+        db.removeRole(roleChoice);
+    });
+
+    return prompt;
+};
+
+promptDepartmentBudget = async () => {
+    const departmentPrompt = await db.getDepartments().then(table => {
+        return promptChoices('Which department would you like to remove?', 'dept', table)
+    });
+
+    const prompt = await inquirer.prompt([
+        departmentPrompt
+    ]).then(({ deptChoice }) => {
+        return db.getBudget(deptChoice);
+    });
+
+    return prompt;
+};
 
 const init = () => {
     console.log(`
