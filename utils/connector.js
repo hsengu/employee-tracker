@@ -31,7 +31,7 @@ const getRoles = () => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT r.id, r.title, r.salary, d.name AS department
              FROM role r
-             JOIN department d ON r.department_id = d.id
+             LEFT JOIN department d ON r.department_id = d.id
              ORDER BY r.id;`
         db.query(sql, (err, res, fields) => {
             if(err) {
@@ -53,8 +53,8 @@ const getEmployees = () => {
             r.salary AS salary,
             CONCAT(m.first_name, ' ', m.last_name) AS manager
             FROM employee e
-            JOIN role r ON r.id = e.role_id
-            JOIN department d ON d.id = r.department_id
+            LEFT JOIN role r ON r.id = e.role_id
+            LEFT JOIN department d ON d.id = r.department_id
             LEFT JOIN employee m ON e.manager_id = m.id
             ORDER BY id`
 
@@ -77,8 +77,8 @@ const getEmployeesByDept = department => {
             r.salary AS salary, 
             CONCAT(m.first_name, ' ', m.last_name) AS manager
             FROM employee e
-            JOIN role r ON r.id = e.role_id
-            JOIN department d ON d.id = r.department_id
+            LEFT JOIN role r ON r.id = e.role_id
+            LEFT JOIN department d ON d.id = r.department_id
             LEFT JOIN employee m ON e.manager_id = m.id
             WHERE d.name = ?
             ORDER BY id;`
@@ -118,8 +118,8 @@ const getEmployeesByManager = manager => {
             r.salary AS salary,
             CONCAT(m.first_name, ' ', m.last_name) AS manager
             FROM employee e
-            JOIN role r ON r.id = e.role_id
-            JOIN department d ON d.id = r.department_id
+            LEFT JOIN role r ON r.id = e.role_id
+            LEFT JOIN department d ON d.id = r.department_id
             LEFT JOIN employee m ON e.manager_id = m.id
             WHERE CONCAT(m.first_name, ' ', m.last_name) = ?
             ORDER BY e.id;`
