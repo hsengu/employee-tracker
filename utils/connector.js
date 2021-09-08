@@ -19,6 +19,7 @@ const getDepartments = () => {
         db.query(sql, (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL Error: ${err.message}\n`);
+                return;
             }
             resolve(res);
         });
@@ -35,6 +36,7 @@ const getRoles = () => {
         db.query(sql, (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL Error: ${err}\n`);
+                return;
             }
             resolve(res);
         });
@@ -59,6 +61,7 @@ const getEmployees = () => {
         db.query(sql, (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL Error: ${err.message}\n`);
+                return;
             }
             resolve(res);
         });
@@ -82,6 +85,7 @@ const getEmployeesByDept = department => {
         db.query(sql, department, (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL Error: ${err.message}\n`);
+                return;
             }
             resolve(res);
         });
@@ -122,6 +126,7 @@ const getEmployeesByManager = manager => {
         db.query(sql, manager, (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL Error: ${err.message}\n`);
+                return;
             }
             resolve(res);
         });
@@ -136,6 +141,7 @@ const addDepartment = deptName => {
         db.query(sql, deptName, (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL Error: ${err}\n`);
+                return;
             }
             console.log(`\nSQL Result: Affected Rows - ${res.affectedRows}, Status Code - ${res.warningStatus}`);
             resolve(res);
@@ -151,6 +157,7 @@ const addRole = (roleName, roleSalary, roleDepartment) => {
         db.query(sql, [roleName, roleSalary, roleDepartment], (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL error: ${err}`);
+                return;
             }
             console.log(`\nSQL Result: Affected Rows - ${res.affectedRows}, Status Code - ${res.warningStatus}`);
             resolve(res);
@@ -166,6 +173,7 @@ const addEmployee = (employeeFirstName, employeeLastName, employeeRole, employee
         db.query(sql, [employeeFirstName, employeeLastName, employeeRole, employeeManager], (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL error: ${err}`);
+                return;
             }
             console.log(`\nSQL Result: Affected Rows - ${res.affectedRows}, Status Code - ${res.warningStatus}`);
             resolve(res);
@@ -182,6 +190,7 @@ const updateEmployeeRole = (employeeName, employeeRole) => {
         db.query(sql, [employeeRole, employeeName], (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL error: ${err}`);
+                return;
             }
             console.log(`\nSQL Result: Affected Rows - ${res.affectedRows}, Status Code - ${res.warningStatus}`);
             resolve(res);
@@ -199,6 +208,7 @@ const updateEmployeeManager = (employeeName, employeeManager) => {
         db.query(sql, [employeeManager, employeeName], (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL error: ${err}`);
+                return;
             }
             console.log(`\nSQL Result: Affected Rows - ${res.affectedRows}, Status Code - ${res.warningStatus}`);
             resolve(res);
@@ -213,6 +223,7 @@ const removeEmployee = (employeeName) => {
         db.query(sql, [employeeName], (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL error: ${err}`);
+                return;
             }
             console.log(`\nSQL Result: Affected Rows - ${res.affectedRows}, Status Code - ${res.warningStatus}`);
             resolve(res);
@@ -227,6 +238,7 @@ const removeRole = (roleName) => {
         db.query(sql, roleName, (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL error: ${err}`);
+                return;
             }
             console.log(`\nSQL Result: Affected Rows - ${res.affectedRows}, Status Code - ${res.warningStatus}`);
             resolve(res);
@@ -241,6 +253,7 @@ const removeDepartment = (departmentName) => {
         db.query(sql, departmentName, (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL error: ${err}`);
+                return;
             }
             console.log(`\nSQL Result: Affected Rows - ${res.affectedRows}, Status Code - ${res.warningStatus}`);
             resolve(res);
@@ -259,6 +272,7 @@ const getBudget = (departmentName) => {
         db.query(sql, departmentName, (err, res, fields) => {
             if(err) {
                 console.log(`\nSQL error: ${err}`);
+                return;
             }
             resolve(res);
         });
