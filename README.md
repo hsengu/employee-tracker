@@ -14,7 +14,7 @@
 ## Description
 This application is a terminal app built with Node.js that simulates an Employee Tracker utilizing a MySql database to store Employee, Department, and Role data. This application supports viewing, updating, adding, and removing employees via Inquirer prompts.
 
-View a demo of this application [here]().
+View a demo of this application [here](https://drive.google.com/file/d/1fB4lciQlMXwRu59KTE_PvWRq_VdOQ22h/view?usp=sharing).
 
 ## Built With
 - Node.js
