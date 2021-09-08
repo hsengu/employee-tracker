@@ -3,7 +3,7 @@ const db = require('./connector.js');
 const validateDept = deptName => {
     return db.getDepartments().then(table => {
         let found = table.findIndex(element => element.name === deptName);
-        return found;
+        return found !== -1 ? table[found] : found;
     });
 }
 

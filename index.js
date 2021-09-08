@@ -31,6 +31,8 @@ const prompt = () => {
 };
 
 const choiceHandler = userChoice => {
+    let message = '';
+
     switch(userChoice) {
         case 'View all departments': db.getDepartments().then(table => {
                 console.table(table);
@@ -47,15 +49,23 @@ const choiceHandler = userChoice => {
                 prompt();
             });
             break;
-        case 'View all employees by Department': db.getDepartments().then(table => {
-                promptDepartments(table).then(deptEmployeeTable => {
+        case 'View all employees by Department': 
+            message = 'Which department would you like to view?';
+            db.getDepartments().then(table => {
+                inquirer.prompt(promptChoices(message, 'dept', table)).then(department => {
+                    return db.getEmployeesByDept(department.deptChoice);
+                }).then(deptEmployeeTable => {
                     console.table(deptEmployeeTable);
                     prompt();
                 })
             });
             break;
-        case 'View all employees by Manager': db.getManagers().then(table => {
-                promptManagers(table).then(mgrEmployeeTable => {
+        case 'View all employees by Manager': 
+            message = "Which manager's employees would you like to view?";
+            db.getManagers().then(table => {
+                inquirer.prompt(promptChoices(message, 'mgr', table)).then(manager => {
+                    return db.getEmployeesByManager(manager.mgrChoice);
+                }).then(mgrEmployeeTable => {
                     console.table(mgrEmployeeTable);
                     prompt();
                 })
@@ -84,32 +94,13 @@ const choiceHandler = userChoice => {
     }
 };
 
-const promptDepartments = departments => {    
-    departments = departments.map(element => element.name)
-    return inquirer.prompt([
-        {
-            type: 'list',
-            name: 'deptChoice',
-            message: 'Which department would you like to view?',
-            choices: departments
-        }
-    ]).then(({ deptChoice }) => {
-        return db.getEmployeesByDept(deptChoice);
-    });
-};
-
-const promptManagers = managers => {    
-    managers = managers.map(element => element.name)
-    return inquirer.prompt([
-        {
-            type: 'list',
-            name: 'mgrChoice',
-            message: 'Which manager would you like to view?',
-            choices: managers
-        }
-    ]).then(({ mgrChoice }) => {
-        return db.getEmployeesByManager(mgrChoice);
-    });
+const promptChoices = (msg, type, choices) => {    
+    return {
+        type: 'list',
+        name: `${type}Choice`,
+        message: msg,
+        choices: choices.map(element => element.name || element.title)
+    }
 };
 
 promptAddDepartment = () => {
@@ -129,8 +120,12 @@ promptAddDepartment = () => {
     })
 };
 
-promptAddRole = () => {
-    return inquirer.prompt([
+promptAddRole = async () => {
+    const deptPrompt = await db.getDepartments().then(table => {
+            return promptChoices('What department does this role belong to?', 'role', table);
+    });
+
+    const prompt = await inquirer.prompt([
         {
             type: 'text',
             name: 'roleName',
@@ -152,20 +147,51 @@ promptAddRole = () => {
                 return result;
             }
         },
+        deptPrompt
+    ]).then(({ roleName, roleSalary, roleChoice }) => {
+        return db.addRole(roleName, roleSalary, roleChoice);
+    });
+
+    return prompt;
+};
+
+promptAddEmployee = async () => {
+    const rolePrompt = await db.getRoles().then(table => {
+        return promptChoices('What role does this employee have?', 'role', table);
+    });
+
+    const managerPrompt = await db.getEmployees().then(table => {
+        return promptChoices('Which manager does this employee report to?', 'mgr', table);
+    });
+
+    const prompt = await inquirer.prompt([
         {
             type: 'text',
-            name: 'roleDepartment',
-            message: 'What is the name of the department this role belongs to? (Required)',
-            validate: async roleDeptInput => {
-                const result = await val.validateDept(roleDeptInput);
-                if(result === -1)
-                    console.log('\nYou must enter a valid department!');
-                return result !== -1;
+            name: 'employeeFirstName',
+            message: 'What is the first name of the employee you would like to add? (Required)',
+            validate: employeeFirstNameInput => {
+                if(!employeeFirstNameInput)
+                    console.log('\nYou must enter an employee first name!');
+                return(employeeFirstNameInput !== '');
             }
-        }
-    ]).then(({ roleName, roleSalary, roleDepartment }) => {
-        
-    });
+        },
+        {
+            type: 'text',
+            name: 'employeeLastName',
+            message: 'What is the last name of the employee you would like to add? (Required)',
+            validate: employeeLastNameInput => {
+                if(!employeeLastNameInput)
+                    console.log('\nYou must enter an employee last name!');
+                return(employeeLastNameInput !== '');
+            }
+        },
+        rolePrompt,
+        managerPrompt
+    ]).then(answers => {
+        console.log(answers);
+    })
+
+    return prompt;
 };
 
 
