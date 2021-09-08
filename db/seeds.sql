@@ -26,14 +26,7 @@ VALUES
     (7, 'Tom', 'Allen', 7),
     (8, 'Christian', 'Eckenrode', 3);
 
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES
-    (1, 'John', 'Doe', 1, 3),
-    (2, 'Mike', 'Chan', 2, 1),
-    (3, 'Ashley', 'Rodriguez', 3, NULL),
-    (4, 'Kevin', 'Tupik', 4, 3),
-    (5, 'Malia', 'Brown', 5, NULL),
-    (6, 'Sarah', 'Lourd', 6, NULL),
-    (7, 'Tom', 'Allen', 7, 6),
-    (8, 'Christian', 'Eckenrode', 3, 2)
-ON DUPLICATE KEY UPDATE manager_id=VALUES(manager_id);
+UPDATE employee SET manager_id = 3 WHERE id IN (1, 4);
+UPDATE employee SET manager_id = 1 WHERE id = 2;
+UPDATE employee SET manager_id = 6 WHERE id = 7;
+UPDATE employee SET manager_id = 2 WHERE id = 8;
